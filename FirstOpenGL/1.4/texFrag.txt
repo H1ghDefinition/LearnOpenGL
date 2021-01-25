@@ -1,0 +1,13 @@
+#version 330 core
+out vec4 FragColor;
+
+in vec3 ourColor;
+in vec2 TexCoord;
+
+uniform sampler2D ourTexture; // GLSL供纹理对象使用的纹理采样器类型sampler[123]D
+
+void main()
+{
+    //FragColor = texture(ourTexture, TexCoord);// texture(纹理采样器，对应的纹理坐标)采样纹理的颜色
+    FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0); // 纹理颜色与顶点颜色相乘进行混合
+}
