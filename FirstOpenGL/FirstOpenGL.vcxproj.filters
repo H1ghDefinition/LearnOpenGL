@@ -25,6 +25,18 @@
     <Filter Include="源文件\1.5">
       <UniqueIdentifier>{28478fb1-005d-4a93-86e8-52df6c49d552}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\1.6">
+      <UniqueIdentifier>{48b6be40-a246-4eab-b381-36d02a188abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\1.7">
+      <UniqueIdentifier>{6e2e2ff4-7cf3-4a17-941e-2ef1e19e0100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\2.1">
+      <UniqueIdentifier>{0ec3bd61-52b1-4887-8354-317d34f2dc90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\2.2">
+      <UniqueIdentifier>{032bccc0-0ef1-44cd-af24-568d92e4c644}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Shader.cpp">
@@ -63,12 +75,48 @@
     <ClCompile Include="1.5\1.5.1.cpp">
       <Filter>源文件\1.5</Filter>
     </ClCompile>
+    <ClCompile Include="1.6\1.6.1.cpp">
+      <Filter>源文件\1.6</Filter>
+    </ClCompile>
+    <ClCompile Include="1.6\1.6.2.cpp">
+      <Filter>源文件\1.6</Filter>
+    </ClCompile>
+    <ClCompile Include="1.7\1.7.1.cpp">
+      <Filter>源文件\1.7</Filter>
+    </ClCompile>
+    <ClCompile Include="1.7\1.7.2.cpp">
+      <Filter>源文件\1.7</Filter>
+    </ClCompile>
+    <ClCompile Include="1.7\1.7.3.cpp">
+      <Filter>源文件\1.7</Filter>
+    </ClCompile>
+    <ClCompile Include="2.2\2.2.1.cpp">
+      <Filter>源文件\2.2</Filter>
+    </ClCompile>
+    <ClCompile Include="2.1\2.1.1.cpp">
+      <Filter>源文件\2.1</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Material.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Light.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tools\Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Tools\stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Light.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -103,5 +151,49 @@
     <Text Include="1.4\vert142.txt">
       <Filter>源文件\1.4</Filter>
     </Text>
+    <Text Include="1.5\frag151.txt">
+      <Filter>源文件\1.5</Filter>
+    </Text>
+    <Text Include="1.5\vert151.txt">
+      <Filter>源文件\1.5</Filter>
+    </Text>
+    <Text Include="1.6\vert161.txt">
+      <Filter>源文件\1.6</Filter>
+    </Text>
+    <Text Include="1.6\frag161.txt">
+      <Filter>源文件\1.6</Filter>
+    </Text>
+    <Text Include="1.6\frag162.txt">
+      <Filter>源文件\1.6</Filter>
+    </Text>
+    <Text Include="1.6\vert162.txt">
+      <Filter>源文件\1.6</Filter>
+    </Text>
+    <Text Include="2.1\frag211.frag">
+      <Filter>源文件\2.1</Filter>
+    </Text>
+    <Text Include="2.1\lt_frag211.frag">
+      <Filter>源文件\2.1</Filter>
+    </Text>
+    <Text Include="2.1\lt_vert211.vert">
+      <Filter>源文件\2.1</Filter>
+    </Text>
+    <Text Include="2.1\vert211.vert">
+      <Filter>源文件\2.1</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="2.2\frag221.frag">
+      <Filter>源文件\2.2</Filter>
+    </None>
+    <None Include="2.2\lt_frag221.frag">
+      <Filter>源文件\2.2</Filter>
+    </None>
+    <None Include="2.2\lt_vert221.vert">
+      <Filter>源文件\2.2</Filter>
+    </None>
+    <None Include="2.2\vert221.vert">
+      <Filter>源文件\2.2</Filter>
+    </None>
   </ItemGroup>
 </Project>

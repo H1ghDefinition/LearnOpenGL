@@ -47,10 +47,36 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="1.4\glad.c" />
-    <ClCompile Include="1.5\1.5.1.cpp" />
+    <ClCompile Include="1.5\1.5.1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="1.6\1.6.1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="1.6\1.6.2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="1.7\1.7.1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="1.7\1.7.2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="1.7\1.7.3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="2.1\2.1.1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="2.2\2.2.1.cpp" />
+    <ClCompile Include="Tools\Light.cpp" />
+    <ClCompile Include="Tools\Material.cpp" />
     <ClCompile Include="Tools\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Tools\Camera.h" />
+    <ClInclude Include="Tools\Light.h" />
+    <ClInclude Include="Tools\Material.h" />
     <ClInclude Include="Tools\Shader.h" />
     <ClInclude Include="Tools\stb_image.h" />
   </ItemGroup>
@@ -65,6 +91,22 @@
     <Text Include="1.4\texFrag.txt" />
     <Text Include="1.4\texVert.txt" />
     <Text Include="1.4\vert142.txt" />
+    <Text Include="1.5\frag151.txt" />
+    <Text Include="1.5\vert151.txt" />
+    <Text Include="1.6\frag161.txt" />
+    <Text Include="1.6\frag162.txt" />
+    <Text Include="1.6\vert161.txt" />
+    <Text Include="1.6\vert162.txt" />
+    <Text Include="2.1\frag211.frag" />
+    <Text Include="2.1\lt_frag211.frag" />
+    <Text Include="2.1\lt_vert211.vert" />
+    <Text Include="2.1\vert211.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="2.2\frag221.frag" />
+    <None Include="2.2\lt_frag221.frag" />
+    <None Include="2.2\lt_vert221.vert" />
+    <None Include="2.2\vert221.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
