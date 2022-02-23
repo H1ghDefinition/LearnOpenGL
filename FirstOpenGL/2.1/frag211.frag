@@ -12,20 +12,43 @@ uniform vec3 viewPos; // 摄像机位置，用于表示镜面光照中的观察者位置
 
 uniform int Blinn;
 
-void main()
+uniform bool specularOpened;
+
+// const float levels = 3.0;
+
+vec3 GetAmbient()
 {
     // 用一个常量颜色作为Ambient Lighting环境光照
-    float ambientStrength = 0.2;
+    float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
+    return ambient;
+}
 
-    // 计算漫反射光照
+vec3 GetDiffuse()
+{
     vec3 norm = normalize(Normal); // 在计算时我们只关心向量的方向，因此一般所有计算都用单位向量表示
     vec3 lightDir = normalize(lightPos - FragPos); // 从物体到光源的光线方向 = 光源位置 - 片段位置
-    float diff = max(dot(norm,lightDir), 0.0); // 通过片段法向量和光线方向向量的点乘结果大小，计算光源对当前片段实际的漫反射影响
-    vec3 diffuse = diff * lightColor;
 
+    float diff = max(dot(norm,lightDir), 0.0); // 通过片段法向量和光线方向向量的点乘结果大小，计算光源对当前片段实际的漫反射影响
+
+    // 新增Cel Shading
+    // float level = floor(diff * levels);
+    // diff = level / levels;
+
+    vec3 diffuse = diff * lightColor * objectColor;
+    return diffuse;
+}
+
+vec3 GetSpecular()
+{
+    // 未开启镜面光照
+    if(!specularOpened)
+        return vec3(0.0f);
+
+    vec3 norm = normalize(Normal); // 在计算时我们只关心向量的方向，因此一般所有计算都用单位向量表示
+    vec3 lightDir = normalize(lightPos - FragPos); // 从物体到光源的光线方向 = 光源位置 - 片段位置
     // 计算镜面反射光照
-    float specularStrength = 0.5;
+    float specularStrength = 0.7825;
     vec3 viewDir = normalize(viewPos - FragPos);
     float spec = 0.0;
     if(0 == Blinn)
@@ -38,7 +61,25 @@ void main()
         vec3 halfwayDir = normalize(lightDir + viewDir);
         spec = pow(max(dot(halfwayDir,norm), 0.0), 64);
     }
-    vec3 specular = specularStrength * spec * lightColor;
-    vec3 result = (ambient + diffuse + specular) * objectColor; // 光源颜色和物体颜色相乘（叉乘），得到物体所反射的颜色
+
+    // 新增Cel Shading
+    // level = floor(spec * levels);
+    // spec = level / levels;
+
+    vec3 specular = specularStrength * spec * lightColor * objectColor;
+    return specular;
+}
+
+void main()
+{
+    vec3 ambient = GetAmbient();
+
+    vec3 diffuse = GetDiffuse();
+
+    vec3 specular = GetSpecular();
+
+    vec3 result = ambient + diffuse + specular; // 光源颜色和物体颜色相乘（叉乘），得到物体所反射的颜色
+
+//    result = objectColor;
     FragColor = vec4(result, 1.0); 
 }

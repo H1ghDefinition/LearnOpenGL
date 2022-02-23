@@ -3,6 +3,8 @@
 #include <iostream>
 #include "../Tools/Shader.h"
 
+bool IsGammaCorrectionOpen = false;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
@@ -60,13 +62,20 @@ int main()
 	// 线框模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	// 开启伽马矫正
+	myShader.setBool("Gamma", IsGammaCorrectionOpen);
+
 	// 4. 激活着色器
 	myShader.use();
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(238 / (255.0f), 232 / (255.0f), 170 / (255.0f), 1.0f);
+		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		processInput(window);
+		// 检测是否开启伽马矫正 更新着色器状态
+		myShader.setBool("Gamma", IsGammaCorrectionOpen);
+		myShader.use();
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -93,4 +102,8 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) // 是否按下返回键
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) // 是否按下G键
+	{
+		IsGammaCorrectionOpen = !IsGammaCorrectionOpen;
+	}
 }

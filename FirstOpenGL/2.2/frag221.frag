@@ -1,18 +1,42 @@
 // fragment shader
 #version 330 core
-
 struct Material {
     vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    sampler2D diffuse; // 使用漫反射光照贴图
+    sampler2D specular; // 使用镜面光贴图
+    sampler2D emission; // 放射光贴图
     float shininess;
 }; // 给材质每个光照分量定义一个颜色向量
 
-struct Light {
+// 点光源
+struct PointLight {
     vec3 position;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+// 方向光
+struct DirLight {
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular; 
+};
+
+// 聚光
+struct SpotLight {
+    vec3 position;
+    vec3 direction;
+    float cutOff;
+    float outerCutOff;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular; 
 };
 
 out vec4 FragColor;
@@ -20,41 +44,100 @@ out vec4 FragColor;
 in vec3 Normal; // 从顶点着色器传入的法向量
 in vec3 FragPos; // 从顶点着色器传入的顶点世界空间坐标
 
-uniform vec3 objectColor;
-uniform vec3 lightColor;
+in vec2 TexCoords;
+
+//uniform vec3 objectColor;
+//uniform vec3 lightColor;
 uniform vec3 viewPos; // 摄像机位置，用于表示镜面光照中的观察者位置
 
 uniform int Blinn;
 
 uniform Material material;
-uniform Light light;
 
-void main()
+uniform PointLight light;
+uniform DirLight dirLight;
+uniform SpotLight spotLight;
+
+// 时间变量 为了实现随时间渐变/滚动的效果
+uniform float time;
+
+vec3 CalculatePointLighting(PointLight light)
 {
-    // 用一个常量颜色作为Ambient Lighting环境光照
-    vec3 ambient = light.ambient * material.ambient;
-
-    // 计算漫反射光照
-    vec3 norm = normalize(Normal); // 在计算时我们只关心向量的方向，因此一般所有计算都用单位向量表示
-    vec3 lightDir = normalize(light.position - FragPos); // 从物体到光源的光线方向 = 光源位置 - 片段位置
-    float diff = max(dot(norm,lightDir), 0.0); // 通过片段法向量和光线方向向量的点乘结果大小，计算光源对当前片段实际的漫反射影响
-    vec3 diffuse = light.diffuse * (diff * material.diffuse);
-
-    // 计算镜面反射光照
+    vec3 lightDir = normalize(light.position - FragPos);
+    vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
+
+    vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;
+    float diff = max(dot(norm,lightDir), 0.0);
+    vec3 diffuse = light.diffuse * diff * texture(material.diffuse,TexCoords).rgb;
     float spec = 0.0;
     if(0 == Blinn)
     {
-        vec3 reflectDir = reflect(-lightDir, norm); // 反射向量，第一个参数要求从光源指向片段位置的向量，第二个参数要求片段法向量
-        spec = pow(max(dot(viewDir, reflectDir), 0.0), 32); // 取点乘的32次幂作为该观察角度上的镜面反射影响，这个32是高光的反光度，反光度越高，反射光的能力越强，散射越少，高光点越小
+        vec3 reflectDir = reflect(-lightDir, norm);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     }
     else
     {
         vec3 halfwayDir = normalize(lightDir + viewDir);
-        spec = pow(max(dot(halfwayDir,norm), 0.0), 64);
+        spec = pow(max(dot(halfwayDir,norm), 0.0), material.shininess * 2);
     }
-    vec3 specular = light.specular * (spec * material.specular);
-    // vec3 result = (ambient + diffuse + specular) * objectColor;
-    vec3 result = ambient + diffuse + specular; // 改为用材质属性表示光照下呈现的颜色，不需要再乘上物体本身颜色
+    vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb; 
+
+    float distance = distance(light.position, FragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+    return (ambient + diffuse + specular) * attenuation;
+}
+
+vec3 CalculateDirLighting(DirLight light)
+{
+    vec3 lightDir = normalize(-light.direction);
+    vec3 norm = normalize(Normal);
+    vec3 viewDir = normalize(viewPos - FragPos);
+    // 漫反射着色
+    float diff = max(dot(norm, lightDir), 0.0);
+    // 镜面光着色
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    // 合并结果
+    vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalculateSpotLighting(SpotLight light)
+{
+    vec3 lightDir = normalize(light.position - FragPos);
+    vec3 norm = normalize(Normal);
+    vec3 viewDir = normalize(viewPos - FragPos);
+    // 光源到片元方向 与 光照方向 的夹角余弦
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);  
+
+    // 漫反射着色
+    float diff = max(dot(norm, lightDir), 0.0);
+    // 镜面光着色
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    // 合并结果
+    vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 specular = light.specular * spec * vec3(texture(material.diffuse, TexCoords));
+    return ambient + (diffuse + specular) * intensity;
+}
+
+void main()
+{
+    vec3 result;
+//    result += CalculatePointLighting(light);
+//    result += CalculateDirLighting(dirLight);
+    result += CalculateSpotLighting(spotLight);
+    // 放射光贴图
+    //    vec3 emission = texture(material.emission, TexCoords + vec2(0, time)).rgb;
+    //    emission *= (sin(time) + 1) / 2;
+
     FragColor = vec4(result, 1.0); 
+
 }

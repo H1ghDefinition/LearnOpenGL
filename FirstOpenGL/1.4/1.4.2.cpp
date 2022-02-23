@@ -1,6 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW//glfw3.h>
 #include <iostream>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 #include "Shader.h"
 
@@ -36,6 +39,17 @@ int main()
 	}
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	//// Create a Dear ImGui context, setup some options
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+
+	//// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+
+	//// Initialize Platform + Renderer backends (here: using imgui_impl_win32.cpp + imgui_impl_dx11.cpp)
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
 
 	// 顶点数据
 	//float vertices[] = {
@@ -180,12 +194,27 @@ int main()
 	myShader.setInt("texture1", 0);
 	myShader.setInt("texture2", 1); // 设置uniform为1，等下渲染循环中使用纹理单元GL_TEXTURE1进行绑定
 
+	float mixValue = 0.0f;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 
 		glClearColor(238 / (255.0f), 232 / (255.0f), 170 / (255.0f), 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		{
+			ImGui::Begin("Hello, world!");
+
+			ImGui::SliderFloat("float", &mixValue, 0.0f, 1.0f);
+
+			ImGui::End();
+		}
 
 		// 在glDraw之前绑定纹理即可，其会自动将纹理赋值给片段着色器中的uniform类型采样器
 		glActiveTexture(GL_TEXTURE0);
@@ -194,18 +223,24 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		myShader.use();
 
-		float timeValue = glfwGetTime();
-		float mixValue_t = sin(timeValue) + 1.0f;
-
 		//myShader.setFloat("mixValue", mixValue);
-		myShader.setFloat("mixValue", mixValue_t);
+		myShader.setFloat("mixValue", mixValue);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		//glBindVertexArray(0);
 
+		// Rendering GUI
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
